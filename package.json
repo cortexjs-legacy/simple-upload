@@ -3,8 +3,12 @@
   "version": "0.1.0",
   "description": "simple-upload",
   "main": "index.js",
+  "bin": {
+    "simple-upload": "bin/upload.js"
+  },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec ./test/*.js"
+    "test": "./node_modules/.bin/mocha --reporter spec ./test/*.js",
+    "start": ""
   },
   "repository": {
     "type": "git",
@@ -24,5 +28,9 @@
   "devDependencies": {
     "mocha": "*",
     "chai": "*"
+  },
+  "dependencies": {
+    "minimist": "^0.2.0",
+    "request": "^2.39.0"
   }
 }
