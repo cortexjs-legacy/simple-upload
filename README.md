@@ -19,9 +19,20 @@ $ simple-upload
 
 * --server `url` server url
 
-<!-- * --dir `path` -->
+* --dir `path`
 
-* --zip `path`
+* --remote `path`
+
+## Config upload server
+
+edit `config/default.json`
+
+```
+{
+  "root": "<server root>",
+  "port": 1337
+}
+```
 
 ## Start upload server
 

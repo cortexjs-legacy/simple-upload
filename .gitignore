@@ -42,4 +42,5 @@ jscoverage_lib/
 temp/
 tmp/
 
-
+# Project specified
+config/*.json
