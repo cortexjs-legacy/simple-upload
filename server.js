@@ -7,6 +7,9 @@ var fstream = require('fstream');
 var tar = require('tar');
 var mkdirp = require('mkdirp');
 var path = require('path');
+var Domain = require('domain');
+var tracer = require('tracer');
+var logger = require('tracer').console();
 
 var app = express();
 
@@ -28,20 +31,32 @@ app.post("/", function(req,res,next){
   var filepath = file.path;
   var rootpath = path.join(root, remote);
 
-  mkdirp(rootpath, function(err){
-    if(err){return next(err);}
-    fstream.Reader({
-      path: filepath,
-      type: 'File'
-    })
-    .pipe(zlib.Unzip())
-    .pipe(tar.Extract({
-      path: rootpath
-    }))
-    .on('end', function() {
-      res.status(200).send("ok");
-    })
-    .on('error', next);
+  logger.log("recives %j",file);
+  var domain = Domain.create();
+
+  domain.on('error', function (error) {
+    next(error);
+  });
+
+  domain.run(function () {
+    mkdirp(rootpath, function(err){
+      if(err){return next(err);}
+      fstream.Reader({
+        path: filepath,
+        type: 'File'
+      })
+      .pipe(zlib.Unzip())
+      .pipe(tar.Extract({
+        path: rootpath
+      }))
+      .on('end', function() {
+        fs.unlink(filepath, function(err){
+          if(err){return next(err)}
+          res.status(200).send("ok");
+        });
+      })
+      .on('error', next);
+    });
   });
 });
 
@@ -50,5 +65,5 @@ app.use(function(req,res){
 });
 
 app.listen(config.get('port'),function(){
-  console.log("server started at " + config.get("port"));
+  console.log("simple upload server started at " + config.get("port"));
 });

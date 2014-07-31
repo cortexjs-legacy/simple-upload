@@ -13,6 +13,7 @@ var restler = require('restler');
 var zlib = require('zlib');
 var dir = argv.dir;
 var server = argv.server;
+require('colors');
 
 var remote = argv.remote || ".";
 
@@ -33,7 +34,7 @@ function zip(dir, done){
   var filepath = temp.path({suffix:".zip"});
   dir = path.resolve(dir);
 
-
+  console.log("packing".cyan,dir);
   fstream.Reader({
     path: dir,
     type: 'Directory'
@@ -52,6 +53,7 @@ function zip(dir, done){
 }
 
 function upload(zippath, done){
+  console.log("uploading".cyan,zippath);
   fs.stat(zippath, function(err, stats){
     if(err){return done(err);}
     restler.post(server, {
@@ -60,12 +62,14 @@ function upload(zippath, done){
           "remote": remote,
           "file": restler.file(zippath, null, stats.size, null, "application/zip")
         }
-    }).on("complete", function(data) {
+    }).on("success", function(data) {
       fs.unlink(zippath, function(err){
         if(err){return done(err);}
         done(null, data);
       });
-    });
+    }).on("fail", function(data, response){
+      done(data);
+    }).on("error", done);
   });
 }
 
@@ -77,6 +81,6 @@ async.waterfall([
     upload(zippath, done);
   }
 ], function(err, response_body){
-  if(err){return done(err);}
-  console.log(response_body);
+  if(err){return console.log(err.red);}
+  console.log(response_body.green);
 });
