@@ -81,6 +81,9 @@ async.waterfall([
     upload(zippath, done);
   }
 ], function(err, response_body){
-  if(err){return console.log(err.red);}
+  if(err){
+    console.log(err.red);
+    process.exit(1);
+  }
   console.log(response_body.green);
 });
