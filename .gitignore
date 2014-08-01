@@ -44,3 +44,5 @@ tmp/
 
 # Project specified
 config/*.json
+config/*.yml
+app.json
