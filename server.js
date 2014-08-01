@@ -45,7 +45,7 @@ app.post("/", function(req,res,next){
   domain.run(function () {
     mkdirp(rootpath, function(err){
       if(err){return next(err);}
-      logger.log("extract",filepath);
+      logger.log("extract",filepath,"to",rootpath);
       fstream.Reader({
         path: filepath,
         type: 'File'
