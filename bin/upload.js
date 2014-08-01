@@ -25,6 +25,8 @@ if(!server){
   die("please specify --server");
 }
 
+dir = path.resolve(dir);
+
 function die(message){
   console.log(message.red);
   process.exit(1);
@@ -32,7 +34,6 @@ function die(message){
 
 function zip(dir, done){
   var filepath = temp.path({suffix:".zip"});
-  dir = path.resolve(dir);
 
   console.log("packing".cyan,dir);
   fstream.Reader({
@@ -52,7 +53,7 @@ function zip(dir, done){
   });
 }
 
-function upload(zippath, done){
+function upload(zippath, dirname, done){
   console.log("uploading".cyan,zippath);
   fs.stat(zippath, function(err, stats){
     if(err){return done(err);}
@@ -60,6 +61,7 @@ function upload(zippath, done){
         multipart: true,
         data: {
           "remote": remote,
+          "dirname": dirname,
           "file": restler.file(zippath, null, stats.size, null, "application/zip")
         }
     }).on("success", function(data) {
@@ -78,7 +80,7 @@ async.waterfall([
     zip(dir, done);
   },
   function(zippath, done){
-    upload(zippath, done);
+    upload(zippath, path.basename(dir), done);
   }
 ], function(err, response_body){
   if(err){

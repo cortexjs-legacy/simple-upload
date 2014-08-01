@@ -10,13 +10,17 @@ var path = require('path');
 var Domain = require('domain');
 var tracer = require('tracer');
 var logger = require('tracer').console();
+var chownr = require('chownr');
 
 var app = express();
 
 app.use(multer());
 app.post("/", function(req,res,next){
   var remote = req.body.remote || ".";
-  var root = config.get('root');
+  var dirname = req.body.dirname;
+  var root = config.root;
+  var uid = config.uid;
+  var gid = config.gid;
 
   var files = req.files;
   if(!files || !files.file){
@@ -41,6 +45,7 @@ app.post("/", function(req,res,next){
   domain.run(function () {
     mkdirp(rootpath, function(err){
       if(err){return next(err);}
+      logger.log("extract",filepath);
       fstream.Reader({
         path: filepath,
         type: 'File'
@@ -52,7 +57,16 @@ app.post("/", function(req,res,next){
       .on('end', function() {
         fs.unlink(filepath, function(err){
           if(err){return next(err)}
-          res.status(200).send("ok");
+          if(uid !== undefined && gid !== undefined ){
+            var dirpath = path.join(rootpath,dirname);
+            logger.log("chownr", dirpath);
+            chownr(dirpath, uid, gid, function(err){
+              if(err){return next(err);}
+              res.status(200).send("ok");
+            });
+          }else{
+            res.status(200).send("ok");
+          }
         });
       })
       .on('error', next);
