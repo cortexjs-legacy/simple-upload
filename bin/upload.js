@@ -26,7 +26,7 @@ if(!server){
 }
 
 function die(message){
-  console.log(message);
+  console.log(message.red);
   process.exit(1);
 }
 
@@ -82,8 +82,7 @@ async.waterfall([
   }
 ], function(err, response_body){
   if(err){
-    console.log(err.red);
-    process.exit(1);
+    die(err);
   }
   console.log(response_body.green);
 });
