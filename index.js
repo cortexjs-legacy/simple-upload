@@ -9,7 +9,7 @@ var zlib = require('zlib');
 require('colors');
 
 function zip(dir, done){
-  var filepath = temp.path({suffix:".zip"});
+  var filepath = temp.path({suffix:".tgz"});
 
   console.log("packing".cyan,dir);
   fstream.Reader({
@@ -29,16 +29,16 @@ function zip(dir, done){
   });
 }
 
-function upload(zippath, options, done){
-  console.log("uploading".cyan,zippath);
+function uploadtgz(zippath, options, done){
+  console.log("uploadtgz".cyan,zippath);
   fs.stat(zippath, function(err, stats){
     if(err){return done(err);}
-    restler.post(options.server, {
+    restler.post(options.server + "/tgz", {
         multipart: true,
         data: {
           "remote": options.remote,
           "dirname": options.dirname,
-          "file": restler.file(zippath, null, stats.size, null, "application/zip")
+          "file": restler.file(zippath, null, stats.size, null, "application/x-tgz")
         }
     }).on("success", function(data) {
       fs.unlink(zippath, function(err){
@@ -51,19 +51,44 @@ function upload(zippath, options, done){
   });
 }
 
+function extract(options, done){
+  console.log("extract".cyan,options);
+  restler.post(options.server + "/extract", {
+    data:{
+      "remote": options.remote,
+      "dirname": options.dirname
+    }
+  }).on("success", function(data) {
+    done(null, data);
+  }).on("fail", function(data, response){
+    done(data);
+  }).on("error", done);
+}
 
-module.exports = function(options, callback){
-  dir = path.resolve(options.dir);
+var simpleupload = function(options, done){
   async.waterfall([
     function(done){
-      zip(dir, done);
+      zip(options.dir, done);
     },
     function(zippath, done){
-      upload(zippath, {
-        server: options.server,
-        dirname: path.basename(dir),
-        remote: options.remote
-      }, done);
+      uploadtgz(zippath, options, done);
+    },
+    function(message, done){
+      extract(options, done);
     }
-  ], callback);
+  ], done);
 }
+
+simpleupload.uploadtgz = function(options, done){
+  async.waterfall([
+    function(done){
+      zip(options.dir, done);
+    },
+    function(zippath, done){
+      uploadtgz(zippath, options, done);
+    }
+  ], done);
+};
+simpleupload.extract = extract;
+
+module.exports = simpleupload;
