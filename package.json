@@ -47,6 +47,7 @@
     "chownr": "0.0.1",
     "js-yaml": "~3.1.0",
     "fs-extra": "^0.10.0",
-    "body-parser": "^1.6.2"
+    "body-parser": "^1.6.2",
+    "querystring": "^0.2.0"
   }
 }

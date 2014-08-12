@@ -6,6 +6,7 @@ var fstream = require('fstream');
 var tar = require('tar');
 var restler = require('restler');
 var zlib = require('zlib');
+var qs = require('qs');
 require('colors');
 
 function zip(dir, done){

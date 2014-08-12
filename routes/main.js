@@ -1,4 +1,3 @@
-var config = require('config');
 var logger = require('tracer').console();
 var uploadtgz = require('./util/uploadtgz');
 var extract = require('./util/extract');

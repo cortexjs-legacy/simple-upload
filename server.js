@@ -9,6 +9,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.post("/", require('./routes/main'));
 app.post("/tgz", require('./routes/tgz'));
 app.post("/extract", require('./routes/extract'));
+app.get("/download/*", require('./routes/download'));
 
 app.use(function(req,res){
   res.status(400).send("bad request");
