@@ -1,6 +1,6 @@
 {
   "name": "simple-upload",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "simple-upload",
   "main": "index.js",
   "bin": {
@@ -26,8 +26,9 @@
     "url": "https://github.com/cortexjs/simple-upload/issues"
   },
   "devDependencies": {
-    "mocha": "*",
-    "chai": "*"
+    "mocha": "^1.21.4",
+    "chai": "*",
+    "supertest": "^0.13.0"
   },
   "dependencies": {
     "minimist": "^0.2.0",

@@ -1,34 +1,9 @@
 var async = require('async');
-var temp = require('temp');
-var path = require('path');
 var fs = require('fs');
-var fstream = require('fstream');
-var tar = require('tar');
 var restler = require('restler');
-var zlib = require('zlib');
-var qs = require('qs');
+var zip = require('./routes/util/zip');
 require('colors');
 
-function zip(dir, done){
-  var filepath = temp.path({suffix:".tgz"});
-
-  console.log("packing".cyan,dir);
-  fstream.Reader({
-    path: dir,
-    type: 'Directory'
-  })
-  .pipe(tar.Pack())
-  .pipe(
-    zlib.createGzip({
-      level: 6,
-      memLevel: 6
-    })
-  )
-  .pipe(fstream.Writer(filepath))
-  .on('close', function(){
-    done(null, filepath);
-  });
-}
 
 function uploadtgz(zippath, options, done){
   console.log("uploadtgz".cyan,zippath);
@@ -69,7 +44,7 @@ function extract(options, done){
 var simpleupload = function(options, done){
   async.waterfall([
     function(done){
-      zip(options.dir, done);
+      zip(options.dir, null, done);
     },
     function(zippath, done){
       uploadtgz(zippath, options, done);
@@ -83,7 +58,7 @@ var simpleupload = function(options, done){
 simpleupload.uploadtgz = function(options, done){
   async.waterfall([
     function(done){
-      zip(options.dir, done);
+      zip(options.dir, null, done);
     },
     function(zippath, done){
       uploadtgz(zippath, options, done);
