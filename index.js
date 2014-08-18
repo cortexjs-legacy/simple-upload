@@ -2,6 +2,7 @@ var async = require('async');
 var fs = require('fs');
 var restler = require('restler');
 var zip = require('./routes/util/zip');
+var path = require('path');
 require('colors');
 
 
@@ -28,7 +29,7 @@ function uploadtgz(zippath, options, done){
 }
 
 function extract(options, done){
-  console.log("extract".cyan,options);
+  console.log("extract".cyan, path.join(options.server,options.remote,options.dirname)) ;
   restler.post(options.server + "/extract", {
     data:{
       "remote": options.remote,
